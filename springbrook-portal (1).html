@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Springbrook Dentistry — Team Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #1D9E75;
+  --green-dark: #0F6E56;
+  --green-light: #E1F5EE;
+  --green-mid: #9FE1CB;
+  --text: #1a1a1a;
+  --text-2: #555;
+  --text-3: #999;
+  --border: #e8e8e4;
+  --bg: #fafaf8;
+  --white: #ffffff;
+  --radius: 10px;
+  --radius-lg: 14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+.layout { display: flex; min-height: 100vh; }
+.sidebar { width: 220px; background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 10; }
+.sidebar-logo { padding: 1.5rem 1.25rem 1rem; border-bottom: 1px solid var(--border); }
+.practice { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--text); line-height: 1.2; }
+.tagline { font-size: 11px; color: var(--text-3); margin-top: 2px; letter-spacing: 0.04em; }
+.dot { color: var(--green); }
+.nav { padding: 1rem 0.75rem; flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius); font-size: 13.5px; cursor: pointer; color: var(--text-2); transition: all 0.15s; border: none; background: none; width: 100%; text-align: left; }
+.nav-item:hover { background: var(--bg); color: var(--text); }
+.nav-item.active { background: var(--green-light); color: var(--green-dark); font-weight: 500; }
+.nav-icon { width: 18px; height: 18px; flex-shrink: 0; opacity: 0.7; }
+.nav-item.active .nav-icon { opacity: 1; }
+.nav-section { font-size: 10px; letter-spacing: 0.08em; color: var(--text-3); padding: 12px 12px 4px; text-transform: uppercase; }
+.sidebar-footer { padding: 1rem 1.25rem; border-top: 1px solid var(--border); font-size: 11px; color: var(--text-3); line-height: 1.5; }
+.main { margin-left: 220px; flex: 1; display: flex; flex-direction: column; }
+.topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+.page-title { font-size: 16px; font-weight: 500; }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: var(--radius); font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+.btn-primary { background: var(--green); color: white; border: none; font-weight: 500; }
+.btn-primary:hover { background: var(--green-dark); }
+.btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-2); }
+.btn-ghost:hover { border-color: #ccc; color: var(--text); background: var(--bg); }
+.content { padding: 2rem; flex: 1; }
+.view { display: none; }
+.view.active { display: block; }
+.board-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.select-field { font-size: 13px; padding: 7px 12px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--white); color: var(--text); font-family: 'DM Sans', sans-serif; cursor: pointer; }
+.board-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.column { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+.col-head { padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+.col-label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; }
+.col-dot { width: 8px; height: 8px; border-radius: 50%; }
+.col-count { font-size: 11px; background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 1px 8px; color: var(--text-3); }
+.cards { padding: 10px; display: flex; flex-direction: column; gap: 8px; min-height: 80px; }
+.card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
+.card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; gap: 8px; }
+.card-title { font-size: 13px; line-height: 1.4; flex: 1; }
+.badge { font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 500; white-space: nowrap; flex-shrink: 0; }
+.b-high { background: #fde8e8; color: #b91c1c; }
+.b-med { background: #fef3c7; color: #92400e; }
+.b-low { background: #d1fae5; color: #065f46; }
+.card-footer { display: flex; align-items: center; justify-content: space-between; }
+.avatar-pill { display: flex; align-items: center; gap: 6px; }
+.av { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; flex-shrink: 0; }
+.av-name { font-size: 11px; color: var(--text-2); }
+.due-tag { font-size: 11px; color: var(--text-3); }
+.due-tag.over { color: #b91c1c; }
+.card-actions { display: flex; gap: 4px; margin-top: 10px; flex-wrap: wrap; }
+.card-btn { font-size: 10px; padding: 3px 8px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text-2); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.12s; }
+.card-btn:hover { border-color: var(--green); color: var(--green); }
+.card-btn.done-btn { border-color: var(--green-mid); color: var(--green); }
+.card-btn.del-btn { margin-left: auto; color: var(--text-3); }
+.card-btn.del-btn:hover { border-color: #fca5a5; color: #b91c1c; }
+.card-note { font-size: 11px; color: var(--text-3); margin-top: 8px; font-style: italic; border-top: 1px solid var(--border); padding-top: 6px; }
+.empty-col { font-size: 12px; color: var(--text-3); text-align: center; padding: 20px 8px; }
+.loading { text-align: center; padding: 3rem; color: var(--text-3); font-size: 13px; }
+.spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 10px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.error-box { background: #fde8e8; border: 1px solid #fca5a5; border-radius: var(--radius); padding: 12px 16px; font-size: 13px; color: #b91c1c; margin-bottom: 1rem; }
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 200; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--border); width: 100%; max-width: 440px; padding: 1.75rem; margin: 1rem; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+.modal h3 { font-size: 16px; font-weight: 500; margin-bottom: 1.25rem; }
+.form-field { margin-bottom: 14px; }
+.form-field label { font-size: 12px; color: var(--text-2); display: block; margin-bottom: 5px; }
+.form-field input, .form-field select, .form-field textarea { width: 100%; font-size: 13px; padding: 8px 12px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--white); color: var(--text); font-family: 'DM Sans', sans-serif; }
+.form-field textarea { resize: vertical; min-height: 80px; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; }
+.person-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.person-tab { padding: 7px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; border: 1px solid var(--border); background: var(--white); color: var(--text-2); transition: all 0.12s; display: flex; align-items: center; gap: 7px; }
+.person-tab.active { background: var(--green-light); border-color: var(--green-mid); color: var(--green-dark); font-weight: 500; }
+.task-list { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+.task-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.task-row:last-child { border-bottom: none; }
+.check-circle { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--border); background: transparent; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; transition: all 0.15s; }
+.check-circle:hover { border-color: var(--green); }
+.check-circle.checked { background: var(--green); border-color: var(--green); color: white; }
+.task-info { flex: 1; }
+.task-name { font-size: 13.5px; color: var(--text); }
+.task-name.done-text { text-decoration: line-through; color: var(--text-3); }
+.task-meta { font-size: 11px; color: var(--text-3); margin-top: 3px; display: flex; align-items: center; gap: 8px; }
+.sec-head { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); padding: 10px 16px 6px; background: var(--bg); border-bottom: 1px solid var(--border); font-weight: 500; }
+.members-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.member-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; display: flex; align-items: center; gap: 14px; }
+.member-av { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0; }
+.member-name { font-size: 14px; font-weight: 500; }
+.member-role { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+.content-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2rem; }
+.content-card h2 { font-family: 'DM Serif Display', serif; font-size: 24px; margin-bottom: 0.5rem; }
+.content-card .subtitle { font-size: 14px; color: var(--text-2); margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+.coming-soon { background: var(--bg); border: 1.5px dashed var(--border); border-radius: var(--radius-lg); padding: 4rem 2rem; text-align: center; }
+.coming-soon .cs-icon { font-size: 36px; margin-bottom: 1rem; }
+.coming-soon h3 { font-size: 16px; font-weight: 500; color: var(--text-2); margin-bottom: 0.5rem; }
+.coming-soon p { font-size: 13px; color: var(--text-3); max-width: 300px; margin: 0 auto; line-height: 1.6; }
+@media (max-width: 768px) {
+  .sidebar { width: 100%; height: auto; position: relative; }
+  .main { margin-left: 0; }
+  .board-columns { grid-template-columns: 1fr; }
+  .layout { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="practice">Springbrook<span class="dot">.</span><br>Dentistry</div>
+    <div class="tagline">Team Portal</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Workspace</div>
+    <button class="nav-item active" onclick="showView('tasks')" id="nav-tasks">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Task Board
+    </button>
+    <button class="nav-item" onclick="showView('mytasks')" id="nav-mytasks">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      My Tasks
+    </button>
+    <button class="nav-item" onclick="showView('members')" id="nav-members">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      Team
+    </button>
+    <div class="nav-section" style="margin-top:8px;">Handbook</div>
+    <button class="nav-item" onclick="showView('values')" id="nav-values">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Values
+    </button>
+    <button class="nav-item" onclick="showView('sops')" id="nav-sops">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      SOPs
+    </button>
+    <button class="nav-item" onclick="showView('policies')" id="nav-policies">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+      Policies
+    </button>
+  </nav>
+  <div class="sidebar-footer">Springbrook Dentistry<br>Alcoa, Tennessee</div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="page-title" id="page-title">Task Board</div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost" onclick="loadTasks()" id="refresh-btn">↻ Refresh</button>
+      <button class="btn btn-primary" onclick="openModal()" id="add-btn">+ Add Task</button>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- TASK BOARD -->
+    <div class="view active" id="view-tasks">
+      <div class="board-toolbar">
+        <select class="select-field" id="filter-person" onchange="renderBoard()">
+          <option value="">All staff</option>
+          <option>Genesis</option><option>Rosie</option><option>Matthew</option>
+          <option>Jaque</option><option>Rue</option><option>Dr C</option>
+        </select>
+        <select class="select-field" id="filter-priority" onchange="renderBoard()">
+          <option value="">All priorities</option>
+          <option>High</option><option>Medium</option><option>Low</option>
+        </select>
+      </div>
+      <div id="board-error"></div>
+      <div id="board"></div>
+    </div>
+
+    <!-- MY TASKS -->
+    <div class="view" id="view-mytasks">
+      <div class="person-tabs" id="person-tabs"></div>
+      <div id="mytasks-content"></div>
+    </div>
+
+    <!-- TEAM -->
+    <div class="view" id="view-members">
+      <div class="members-grid" id="members-grid"></div>
+    </div>
+
+    <!-- VALUES -->
+    <div class="view" id="view-values">
+      <div class="content-card">
+        <h2>Values</h2>
+        <p class="subtitle">Coming soon — Rue will add Springbrook's values and mission statement here.</p>
+        <div class="coming-soon">
+          <div class="cs-icon">🌿</div>
+          <h3>Content coming this week</h3>
+          <p>This section will hold Springbrook Dentistry's core values and mission statement.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOPs -->
+    <div class="view" id="view-sops">
+      <div class="content-card">
+        <h2>Standard Operating Procedures</h2>
+        <p class="subtitle">Coming soon — step-by-step guides for our most important daily workflows.</p>
+        <div class="coming-soon">
+          <div class="cs-icon">📋</div>
+          <h3>Content coming this week</h3>
+          <p>This section will hold SOPs for front desk, clinical, and billing workflows.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- POLICIES -->
+    <div class="view" id="view-policies">
+      <div class="content-card">
+        <h2>Policies</h2>
+        <p class="subtitle">Coming soon — HR, conduct, and operational policies for the team.</p>
+        <div class="coming-soon">
+          <div class="cs-icon">📌</div>
+          <h3>Content coming this week</h3>
+          <p>This section will hold attendance, communication, and HR policies.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ADD TASK MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3>New Task</h3>
+    <div class="form-field">
+      <label>Task description</label>
+      <input type="text" id="t-title" placeholder="What needs to be done?">
+    </div>
+    <div class="form-field">
+      <label>Assign to</label>
+      <select id="t-person">
+        <option>Genesis</option><option>Rosie</option><option>Matthew</option>
+        <option>Jaque</option><option>Rue</option><option>Dr C</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label>Priority</label>
+      <select id="t-priority">
+        <option>Medium</option><option>High</option><option>Low</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label>Due date</label>
+      <input type="date" id="t-due">
+    </div>
+    <div class="form-field">
+      <label>Notes (optional)</label>
+      <textarea id="t-notes" placeholder="Any extra details..."></textarea>
+    </div>
+    <div id="modal-error" style="font-size:12px;color:#b91c1c;margin-top:4px;display:none;"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="save-btn" onclick="saveTask()">Add Task</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TOKEN = 'pat1YDQ6qJZkQIesD.2dcb9e51d0d52133d0b61e23ed2a34da93407996932719e03c18f07e1e544fc8';
+const BASE  = 'apph0TDQ2hmZiAh51';
+const TABLE = 'Table 1';
+const URL   = `https://api.airtable.com/v0/${BASE}/${encodeURIComponent(TABLE)}`;
+const HDR   = { 'Authorization': `Bearer ${TOKEN}`, 'Content-Type': 'application/json' };
+
+const MEMBERS = {
+  Genesis: { initials:'GE', color:'#185FA5', bg:'#E6F1FB', role:'Treatment & Insurance Coordinator' },
+  Rosie:   { initials:'RO', color:'#3B6D11', bg:'#EAF3DE', role:'Front Desk (Mon–Tue)' },
+  Matthew: { initials:'MA', color:'#854F0B', bg:'#FAEEDA', role:'Dental Assistant' },
+  Jaque:   { initials:'JA', color:'#993556', bg:'#FBEAF0', role:'Registered Dental Hygienist' },
+  Rue:     { initials:'RU', color:'#533AB7', bg:'#EEEDFE', role:'Office Manager' },
+  'Dr C':  { initials:'DC', color:'#0F6E56', bg:'#E1F5EE', role:'Dentist / Practice Owner' }
+};
+
+const COLS = [
+  { id:'Todo',        label:'To Do',       dot:'#888780' },
+  { id:'In Progress', label:'In Progress', dot:'#BA7517' },
+  { id:'Done',        label:'Done',        dot:'#1D9E75' }
+];
+
+let tasks = [];
+let activeTab = 'Genesis';
+let currentView = 'tasks';
+
+async function loadTasks() {
+  document.getElementById('board').innerHTML = '<div class="loading"><div class="spinner"></div>Loading tasks...</div>';
+  document.getElementById('board-error').innerHTML = '';
+  try {
+    let all = [], offset = null;
+    do {
+      const u = URL + '?pageSize=100' + (offset ? '&offset=' + offset : '');
+      const r = await fetch(u, { headers: HDR });
+      if (!r.ok) throw new Error('Status ' + r.status);
+      const d = await r.json();
+      all = all.concat(d.records.map(rec => ({
+        id:       rec.id,
+        title:    rec.fields.Title    || '',
+        person:   rec.fields.Person   || '',
+        priority: rec.fields.Priority || 'Medium',
+        status:   rec.fields.Status   || 'Todo',
+        due:      rec.fields.Due      || '',
+        notes:    rec.fields.Notes    || ''
+      })));
+      offset = d.offset;
+    } while (offset);
+    tasks = all;
+    renderBoard();
+    if (currentView === 'mytasks') renderMyTasks();
+  } catch(e) {
+    document.getElementById('board').innerHTML = '';
+    document.getElementById('board-error').innerHTML =
+      `<div class="error-box">Could not connect to Airtable. Please check your internet connection and try refreshing. (${e.message})</div>`;
+  }
+}
+
+function fmtDue(str) {
+  if (!str) return null;
+  const d = new Date(str + 'T00:00:00');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const diff = Math.round((d - today) / 86400000);
+  if (diff < 0) return { label: 'Overdue', cls: 'over' };
+  if (diff === 0) return { label: 'Today', cls: '' };
+  if (diff === 1) return { label: 'Tomorrow', cls: '' };
+  return { label: d.toLocaleDateString('en-US', { month:'short', day:'numeric' }), cls: '' };
+}
+
+function pClass(p) { return p==='High'?'b-high':p==='Low'?'b-low':'b-med'; }
+
+function renderBoard() {
+  const fp  = document.getElementById('filter-person').value;
+  const fpr = document.getElementById('filter-priority').value;
+  const board = document.getElementById('board');
+  board.innerHTML = '<div class="board-columns" id="bcols"></div>';
+  const bcols = document.getElementById('bcols');
+  COLS.forEach(col => {
+    const items = tasks.filter(t =>
+      t.status === col.id &&
+      (!fp  || t.person   === fp) &&
+      (!fpr || t.priority === fpr)
+    );
+    const colEl = document.createElement('div');
+    colEl.className = 'column';
+    colEl.innerHTML = `
+      <div class="col-head">
+        <div class="col-label"><div class="col-dot" style="background:${col.dot}"></div>${col.label}</div>
+        <span class="col-count">${items.length}</span>
+      </div>
+      <div class="cards" id="col-${col.id.replace(' ','-')}">
+        ${items.length === 0 ? '<div class="empty-col">No tasks</div>' : ''}
+      </div>`;
+    bcols.appendChild(colEl);
+    const cardsEl = colEl.querySelector('.cards');
+    items.forEach(t => {
+      const m   = MEMBERS[t.person] || { initials:'?', color:'#555', bg:'#eee' };
+      const due = fmtDue(t.due);
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="card-top">
+          <div class="card-title">${t.title}</div>
+          <span class="badge ${pClass(t.priority)}">${t.priority}</span>
+        </div>
+        <div class="card-footer">
+          <div class="avatar-pill">
+            <div class="av" style="background:${m.bg};color:${m.color}">${m.initials}</div>
+            <span class="av-name">${t.person}</span>
+          </div>
+          ${due ? `<span class="due-tag ${due.cls}">${due.label}</span>` : ''}
+        </div>
+        ${t.notes ? `<div class="card-note">${t.notes}</div>` : ''}
+        <div class="card-actions">
+          ${col.id !== 'Todo'        ? `<button class="card-btn" onclick="moveTask('${t.id}','Todo')">← To do</button>` : ''}
+          ${col.id !== 'In Progress' ? `<button class="card-btn" onclick="moveTask('${t.id}','In Progress')">${col.id==='Todo'?'Start →':'← In progress'}</button>` : ''}
+          ${col.id !== 'Done'        ? `<button class="card-btn done-btn" onclick="moveTask('${t.id}','Done')">✓ Done</button>` : ''}
+          <button class="card-btn del-btn" onclick="delTask('${t.id}')">✕</button>
+        </div>`;
+      cardsEl.appendChild(card);
+    });
+  });
+}
+
+async function moveTask(id, status) {
+  const t = tasks.find(t => t.id === id);
+  if (!t) return;
+  t.status = status;
+  renderBoard();
+  if (currentView === 'mytasks') renderMyTasks();
+  await fetch(`${URL}/${id}`, {
+    method: 'PATCH', headers: HDR,
+    body: JSON.stringify({ fields: { Status: status } })
+  }).catch(e => console.error('Move failed', e));
+}
+
+async function delTask(id) {
+  if (!confirm('Delete this task?')) return;
+  tasks = tasks.filter(t => t.id !== id);
+  renderBoard();
+  if (currentView === 'mytasks') renderMyTasks();
+  await fetch(`${URL}/${id}`, { method: 'DELETE', headers: HDR })
+    .catch(e => console.error('Delete failed', e));
+}
+
+function renderMyTasks() {
+  const tabs = document.getElementById('person-tabs');
+  tabs.innerHTML = Object.keys(MEMBERS).map(name => {
+    const m    = MEMBERS[name];
+    const open = tasks.filter(t => t.person === name && t.status !== 'Done').length;
+    return `<button class="person-tab ${name===activeTab?'active':''}" onclick="selectPerson('${name}')">
+      <div class="av" style="background:${m.bg};color:${m.color};width:18px;height:18px;font-size:8px">${m.initials}</div>
+      ${name}
+      ${open > 0 ? `<span style="font-size:10px;background:var(--green);color:white;border-radius:20px;padding:0 5px;">${open}</span>` : ''}
+    </button>`;
+  }).join('');
+
+  const open = tasks.filter(t => t.person === activeTab && t.status !== 'Done');
+  const done = tasks.filter(t => t.person === activeTab && t.status === 'Done');
+  let html = '';
+  if (!open.length && !done.length) {
+    html = `<div style="text-align:center;color:#999;padding:3rem;font-size:13px;">No tasks for ${activeTab}</div>`;
+  } else {
+    html = '<div class="task-list">';
+    if (open.length) {
+      html += `<div class="sec-head">Open (${open.length})</div>`;
+      open.forEach(t => {
+        const due = fmtDue(t.due);
+        html += `<div class="task-row">
+          <button class="check-circle" onclick="moveTask('${t.id}','Done');renderMyTasks();" title="Mark done"></button>
+          <div class="task-info">
+            <div class="task-name">${t.title}</div>
+            <div class="task-meta">
+              <span class="badge ${pClass(t.priority)}">${t.priority}</span>
+              ${due ? `<span class="due-tag ${due.cls}">${due.label}</span>` : ''}
+            </div>
+          </div>
+          <button class="card-btn del-btn" onclick="delTask('${t.id}');renderMyTasks();">✕</button>
+        </div>`;
+      });
+    }
+    if (done.length) {
+      html += `<div class="sec-head">Completed (${done.length})</div>`;
+      done.forEach(t => {
+        html += `<div class="task-row">
+          <button class="check-circle checked" onclick="moveTask('${t.id}','Todo');renderMyTasks();" title="Reopen">✓</button>
+          <div class="task-info"><div class="task-name done-text">${t.title}</div></div>
+          <button class="card-btn del-btn" onclick="delTask('${t.id}');renderMyTasks();">✕</button>
+        </div>`;
+      });
+    }
+    html += '</div>';
+  }
+  document.getElementById('mytasks-content').innerHTML = html;
+}
+
+function selectPerson(name) { activeTab = name; renderMyTasks(); }
+
+function renderMembers() {
+  document.getElementById('members-grid').innerHTML = Object.entries(MEMBERS).map(([name, m]) => `
+    <div class="member-card">
+      <div class="member-av" style="background:${m.bg};color:${m.color}">${m.initials}</div>
+      <div><div class="member-name">${name}</div><div class="member-role">${m.role}</div></div>
+    </div>`).join('');
+}
+
+function openModal() {
+  document.getElementById('t-title').value = '';
+  document.getElementById('t-notes').value = '';
+  document.getElementById('t-due').value = new Date().toISOString().split('T')[0];
+  document.getElementById('modal-error').style.display = 'none';
+  document.getElementById('save-btn').textContent = 'Add Task';
+  document.getElementById('save-btn').disabled = false;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+async function saveTask() {
+  const title = document.getElementById('t-title').value.trim();
+  if (!title) { document.getElementById('t-title').focus(); return; }
+  const btn = document.getElementById('save-btn');
+  btn.textContent = 'Saving...';
+  btn.disabled = true;
+  document.getElementById('modal-error').style.display = 'none';
+  const fields = {
+    Title:    title,
+    Person:   document.getElementById('t-person').value,
+    Priority: document.getElementById('t-priority').value,
+    Status:   'Todo',
+    Due:      document.getElementById('t-due').value,
+    Notes:    document.getElementById('t-notes').value.trim()
+  };
+  try {
+    const r = await fetch(URL, {
+      method: 'POST', headers: HDR,
+      body: JSON.stringify({ fields })
+    });
+    if (!r.ok) throw new Error('Status ' + r.status);
+    const d = await r.json();
+    tasks.push({ id: d.id, ...fields, status: 'Todo' });
+    closeModal();
+    renderBoard();
+    if (currentView === 'mytasks') renderMyTasks();
+  } catch(e) {
+    const el = document.getElementById('modal-error');
+    el.textContent = 'Could not save. Please try again. (' + e.message + ')';
+    el.style.display = 'block';
+    btn.textContent = 'Add Task';
+    btn.disabled = false;
+  }
+}
+
+document.getElementById('modal').addEventListener('click', e => { if (e.target === document.getElementById('modal')) closeModal(); });
+
+const VIEW_TITLES = { tasks:'Task Board', mytasks:'My Tasks', members:'Team', values:'Values', sops:'SOPs', policies:'Policies' };
+function showView(id) {
+  currentView = id;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  document.getElementById('nav-'  + id).classList.add('active');
+  document.getElementById('page-title').textContent = VIEW_TITLES[id];
+  const isTask = id === 'tasks' || id === 'mytasks';
+  document.getElementById('add-btn').style.display     = isTask ? 'inline-flex' : 'none';
+  document.getElementById('refresh-btn').style.display = isTask ? 'inline-flex' : 'none';
+  if (id === 'tasks')   renderBoard();
+  if (id === 'mytasks') renderMyTasks();
+  if (id === 'members') renderMembers();
+}
+
+loadTasks();
+renderMembers();
+</script>
+</body>
+</html>
